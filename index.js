@@ -1,80 +1,43 @@
-const POSTS_ENDPOINT = 'https://jsonplaceholder.typicode.com/posts/';
-const USERS_ENDPOINT = 'https://jsonplaceholder.typicode.com/users/';
+const React = {
+  createElement(tagName, property, children) {
 
-const posts = () => {
-  fetchData(POSTS_ENDPOINT, showPosts);
-}
+    const element = document.createElement(tagName);
 
-const user = () => {
-  fetchData(`${USERS_ENDPOINT}/${getId()}`, showUser);
-}
+    if (property && property.textContent){
+      element.textContent = property.textContent;
+    }
 
-const userPosts = () => {
-  fetchData(`${POSTS_ENDPOINT}?userId=${getId()}`, showPosts);
-}
+    if (property && property.style){
+      for (let key in property.style) {
+        element.style[key] = property.style[key];
+      }
+    }
 
-const post = () => {
-  fetchData(`${POSTS_ENDPOINT}/${getId()}`, showPost);
-}
+    if (children && Array.isArray(children)) {
+      children.forEach((item) => {
+        (!!item.nodeType) ? element.appendChild(item) : element.appendChild(document.createTextNode(item));
+      });
+    }
+    if (children && !Array.isArray(children)) {
+      element.appendChild(document.createTextNode(children));
+    }
+    return element;
+  },
 
-const postComments = () => {
-  fetchData(`${POSTS_ENDPOINT}${getId()}/comments`, showPostComments);
-}
-
-const getId = () => {
-  return +window.location.href.slice(-1);
-}
-
-const fetchData = (url, method) => {
-  fetch(url)
-  .then(response => response.json())
-  .then(json => { method(json); });	
+  render(element, rootElement) {
+    rootElement.appendChild(element);
+  },
 }
 
-const showPost = (post) => {
-  $('#content').append(`<li>
-    <a href='?userId=${post.userId}'>UserId: ${post.userId}</a>
-    <p>Id: ${post.id}</p><p>Title: ${post.title}</p>
-    <button onclick="postComments()">See comments</button>
-  </li>`);
-}
+const app =
+  React.createElement('div', { style: { backgroundColor: 'red' } }, [
+    React.createElement('span', undefined, 'Hello world'),
+    React.createElement('br'),
+    'This is just a text node',
+    React.createElement('div', { textContent: 'Text content' }),
+  ]);
 
-const showUser = (data) => {
-  $('#content').append(`<li>
-    <h4>Name: ${data.name}</h4>
-    <p>Username: ${data.username}</p></li>
-    <p>Email: ${data.email}</p></li>
-    <p>Company name: ${data.company.name}</p></li>
-    <button onclick="userPosts()">See posts</button>
-  </li>`);
-}
-
-const showPostComments = (comments) => {
-  comments.forEach((item) => {
-    $('#content').append(`<li>
-      <h4>Comments ${item.id}</h4>
-      <p>Name: ${item.name}</p>
-      <p>Text: ${item.body}</p>
-      <p>By: ${item.email}</p>
-    </li>`);
-  });
-}
-
-const showPosts = (posts) => {
-  posts.forEach((item) => {
-    $('#content').append(`<li>
-      <a href='?postId=${item.id}'>Title: ${item.title}</a>
-      <p>Id: ${item.id}</p></li>
-      <a href='?userId=${item.userId}'>UserId: ${item.userId}</a></li>`);
-  });
-}
-
-if (window.location.href.match('userId=')){
-  user();
-}
-else if (window.location.href.match('postId=')){
-  post();
-}
-else {
-  posts();
-}
+React.render(
+  app,
+  document.getElementById('root'),
+);
